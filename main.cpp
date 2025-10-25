@@ -27,6 +27,13 @@ int main() {
 
     // Step 1: Read file and count letter frequencies
     buildFrequencyTable(freq, "input.txt");
+    //TODO:*******************DUBUG LINES
+    for (int fre : freq) {
+        if (fre > 0) {
+            cout << fre << " ";
+        }
+    }
+    cout << endl;
 
     // Step 2: Create leaf nodes for each character with nonzero frequency
     int nextFree = createLeafNodes(freq);
@@ -62,6 +69,9 @@ void buildFrequencyTable(int freq[], const string& filename) {
         if (ch >= 'A' && ch <= 'Z')
             ch = ch - 'A' + 'a';
 
+        //TODO:*******************DEBUG LINE
+            cout << ch << " ";
+
         // Count only lowercase letters
         if (ch >= 'a' && ch <= 'z')
             freq[ch - 'a']++;
@@ -91,7 +101,9 @@ int createLeafNodes(int freq[]) {
 int buildEncodingTree(int nextFree) {
     // TODO:
     // 1. Create a MinHeap object.
+        MinHeap heap;
     // 2. Push all leaf node indices into the heap.
+        //heap.push();
     // 3. While the heap size is greater than 1:
     //    - Pop two smallest nodes
     //    - Create a new parent node with combined weight
