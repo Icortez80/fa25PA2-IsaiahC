@@ -103,7 +103,7 @@ int buildEncodingTree(int nextFree) {
     // 1. Create a MinHeap object.
         MinHeap heap;
     // 2. Push all leaf node indices into the heap.
-        //heap.push();
+        //heap.push(idx, weightArr);
     // 3. While the heap size is greater than 1:
     //    - Pop two smallest nodes
     //    - Create a new parent node with combined weight
