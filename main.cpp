@@ -24,18 +24,16 @@ void encodeMessage(const string& filename, string codes[]);
 
 int main() {
     int freq[26] = {0};
-
     // Step 1: Read file and count letter frequencies
     buildFrequencyTable(freq, "input.txt");
-    //TODO:*******************DUBUG LINES
-
-    cout << "freq[]: ";
-    for (int fre : freq) {
-        if (fre > 0) {
-            cout << fre << " ";
-        }
-    }
-    cout << endl;
+    //DUBUG LINES
+    // cout << "freq[]: ";
+    // for (int fre : freq) {
+    //     if (fre > 0) {
+    //         cout << fre << " ";
+    //     }
+    // }
+    // cout << endl;
 
     // Step 2: Create leaf nodes for each character with nonzero frequency
     int nextFree = createLeafNodes(freq);
@@ -45,8 +43,10 @@ int main() {
 
     // Step 3: Build encoding tree using your heap
     int root = buildEncodingTree(nextFree);
+
     //debug line
-    cout << "root: " << root;
+    //cout << "root: " << root;
+    //cout << endl;
 
     // Step 4: Generate binary codes using an STL stack
     string codes[26];
@@ -61,6 +61,32 @@ int main() {
 /*------------------------------------------------------
     Function Definitions (Students will complete logic)
   ------------------------------------------------------*/
+
+void debugFunction(MinHeap heap) {
+    cout << "\nleftArr: ";
+    for(int left: leftArr) {
+        if (left != 0) {
+            cout << left << " ";
+        }
+    }
+    cout << "\nrightArr: ";
+    for(int right: rightArr) {
+        if (right != 0) {
+            cout << right << " ";
+        }
+    }
+    cout << endl;
+
+    cout << "charArr: " << charArr << "\n";
+    cout << "weightArr: ";
+    for(int wght: weightArr) {
+        if (wght > 0) {
+            cout << wght << " ";
+        }
+    }
+    cout << endl;
+    heap.displayHeap();
+}
 
 // Step 1: Read file and count frequencies
 void buildFrequencyTable(int freq[], const string& filename) {
@@ -79,7 +105,6 @@ void buildFrequencyTable(int freq[], const string& filename) {
         if (ch >= 'a' && ch <= 'z')
             freq[ch - 'a']++;
     }
-    //debug line
     cout << endl;
     file.close();
 
@@ -100,30 +125,6 @@ int createLeafNodes(int freq[]) {
     }
     cout << "Created " << nextFree << " leaf nodes.\n";
 
-    //debug lines
-    cout << "charArr: " << charArr << "\n";
-    cout << "weightArr: ";
-    for(int wght: weightArr) {
-        if (wght > 0) {
-            cout << wght << " ";
-        }
-    }
-
-    // cout << "\nleftArr: ";
-    // for(int left: leftArr) {
-    //     if (left != 0) {
-    //         cout << left << " ";
-    //     }
-    // }
-    // cout << "\nrightArr: ";
-    // for(int right: rightArr) {
-    //     if (right != 0) {
-    //         cout << right << " ";
-    //     }
-    // }
-     cout << endl;
-    //debug end
-
     return nextFree;
 }
 
@@ -133,15 +134,13 @@ int buildEncodingTree(int nextFree) {
     // 1. Create a MinHeap object.
         MinHeap heap = MinHeap();
     // 2. Push all leaf node indices into the heap.
-    int idx = 0;
-    for(int next : weightArr) {
-        if (next > 0) {
-            heap.push(idx, weightArr);
-            idx++;
+    for (int i = 0; i < 26; ++i) {
+        if (weightArr[i] > 0) {
+            heap.push(i, weightArr);
         }
     }
     //debug line
-    heap.displayHeap();
+    //heap.displayHeap();
 
     // 3. While the heap size is greater than 1:
     //    - Pop two smallest nodes
@@ -153,46 +152,29 @@ int buildEncodingTree(int nextFree) {
     while (heap.size > 1) {
         int temp1 = heap.pop(weightArr);
         int temp2 = heap.pop(weightArr);
-        parent = nextFree;
+        parent = nextFree++;
 
-        //debug line
-        //cout << "parent: " << parent << "\n";
-
+        if (weightArr[temp1] <= weightArr[temp2]) {
+            leftArr[parent] = temp1;
+            rightArr[parent] = temp2;
+        }else {
+            leftArr[parent] = temp2;
+            rightArr[parent] = temp1;
+        }
 
         weightArr[parent] = weightArr[temp1] + weightArr[temp2];
-        leftArr[parent] = temp1;
-        rightArr[parent] = temp2;
         charArr[parent] = '\0';
         heap.push(parent, weightArr);
-
-        nextFree++;
     }
 
-    //debug lines
-    cout << "\nleftArr: ";
-    for(int left: leftArr) {
-        if (left != 0) {
-            cout << left << " ";
-        }
-    }
-    cout << "\nrightArr: ";
-    for(int right: rightArr) {
-        if (right != 0) {
-            cout << right << " ";
-        }
-    }
-    cout << endl;
-    cout << "final parent: " << parent;
-    cout << endl;
+    //debug line
+    //debugFunction(heap);
 
-    heap.displayHeap();
-
-    return parent; // placeholder
+    return parent = heap.pop(weightArr);
 }
 
 // Step 4: Use an STL stack to generate codes
 void generateCodes(int root, string codes[]) {
-    // TODO:
     // Use stack<pair<int, string>> to simulate DFS traversal.
     stack<pair<int, string>> code;
     code.push(make_pair(root, ""));
@@ -200,27 +182,40 @@ void generateCodes(int root, string codes[]) {
     while (!code.empty()) {
         pair<int, string> topPair = code.top();
         code.pop();
+
         int node = topPair.first;
         string path = topPair.second;
 
+        // If this node is a leaf, record its code
         if (leftArr[node] == -1 && rightArr[node] == -1) {
-            codes[node] = path;
-        }else {
-            // Left edge adds '0', right edge adds '1'.
-             if (rightArr[node] != -1) {
-            // Record code when a leaf node is reached.
-                 code.push(make_pair(rightArr[node], path + '1'));
-            }
-            if (leftArr[node] != -1) {
-            // Record code when a leaf node is reached.
-                code.push(make_pair(leftArr[node], path + '0'));
-            }
+            int idx = charArr[node] - 'a';
+            codes[idx] = path;
+            //debug lines
+            // if (charArr[node] != '\0') {
+            //     cout << charArr[node] << " : " << path << endl;
+            // }
+        }
+        else {
+            if (rightArr[node] != -1)
+                code.push({ rightArr[node], path + "1" });
+            if (leftArr[node] != -1)
+                code.push({ leftArr[node], path + "0" });
         }
     }
+
 }
 
 // Step 5: Print table and encoded message
 void encodeMessage(const string& filename, string codes[]) {
+    //debug
+    // cout << "codes[]: ";
+    // for (int i = 0; i < 26; ++i) {
+    //     cout << codes[i] << " ";
+    // }
+    // cout << endl;
+    //end debug
+
+
     cout << "\nCharacter : Code\n";
     for (int i = 0; i < 26; ++i) {
         if (!codes[i].empty())

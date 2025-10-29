@@ -26,10 +26,10 @@ struct MinHeap {
     int pop(int weightArr[]) {
         // TODO: remove and return smallest index********COMPLETED
         // Replace root with last element, then call downheap()
-        if (this->size == 0 ) return -1;
+        if (size == 0 ) return -1;
 
         int smallest = data[0];
-        data[0] = data[this->size-1];
+        data[0] = data[size-1];
         size--;
 
         downheap(0, weightArr);
@@ -41,7 +41,7 @@ struct MinHeap {
         while (pos > 0) {
             int parentPos = (pos - 1) / 2;
              if (weightArr[data[pos]] < weightArr[data[parentPos]]){
-                swap(weightArr[pos], weightArr[parentPos]);
+                swap(data[pos], data[parentPos]);
                 pos = parentPos;
             }else {
                 return;
@@ -74,7 +74,7 @@ struct MinHeap {
     void displayHeap() {
         //cout << "size: " << this->size << "\n";
         cout << "Building min heap: ";
-        for (int i = 0; i < this->size; i++) {
+        for (int i = 0; i < size; i++) {
             cout << data[i] << " ";
         }
         cout << endl;
