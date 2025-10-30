@@ -154,15 +154,20 @@ int buildEncodingTree(int nextFree) {
         int temp2 = heap.pop(weightArr);
         parent = nextFree++;
 
+        //checking weights
+        //if temp1 is less than temp 2 the lesser is placed on left child(leftArr)
         if (weightArr[temp1] <= weightArr[temp2]) {
             leftArr[parent] = temp1;
             rightArr[parent] = temp2;
         }else {
+            //else temp2 is placed in left child(leftArr)
             leftArr[parent] = temp2;
             rightArr[parent] = temp1;
         }
 
+        //create the parent's weight from both childs
         weightArr[parent] = weightArr[temp1] + weightArr[temp2];
+        //placeholder value for char array
         charArr[parent] = '\0';
         heap.push(parent, weightArr);
     }
@@ -170,6 +175,7 @@ int buildEncodingTree(int nextFree) {
     //debug line
     //debugFunction(heap);
 
+    //returning the root node
     return parent = heap.pop(weightArr);
 }
 
@@ -183,19 +189,23 @@ void generateCodes(int root, string codes[]) {
         pair<int, string> topPair = code.top();
         code.pop();
 
+        //creating pair object for stack
         int node = topPair.first;
         string path = topPair.second;
 
         // If this node is a leaf, record its code
         if (leftArr[node] == -1 && rightArr[node] == -1) {
+            //store letters in their respective spots in char array
             int idx = charArr[node] - 'a';
             codes[idx] = path;
+
             //debug lines
             // if (charArr[node] != '\0') {
             //     cout << charArr[node] << " : " << path << endl;
             // }
         }
         else {
+            //if value is not -1 then follow down the path adding 1 or 0 respective to their side
             if (rightArr[node] != -1)
                 code.push({ rightArr[node], path + "1" });
             if (leftArr[node] != -1)
